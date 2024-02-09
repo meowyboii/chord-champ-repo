@@ -1,9 +1,8 @@
 import React from 'react';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { Entypo, Fontisto } from '@expo/vector-icons';
 import { Link, Tabs } from 'expo-router';
 import { Pressable } from 'react-native';
-
+import { Fontisto, Ionicons } from '@expo/vector-icons';
 import Colors from '@/constants/Colors';
 import { useColorScheme } from '@/components/useColorScheme';
 import { useClientOnlyValue } from '@/components/useClientOnlyValue';
@@ -31,7 +30,7 @@ export default function TabLayout() {
         name="index"
         options={{
           title: 'Chord Recognition',
-          tabBarIcon: ({ color }) => <Fontisto name="music-note" size={24} color={color} /> ,
+          tabBarIcon: ({ color }) => <Fontisto name="music-note" size={24} color={color} />,
           headerRight: () => (
             <Link href="/modal" asChild>
               <Pressable>
@@ -52,7 +51,7 @@ export default function TabLayout() {
         name="two"
         options={{
           title: 'Chord Progression',
-          tabBarIcon: ({ color }) => <Entypo name="menu" size={24} color={color} />,
+          tabBarIcon: ({ color }) => <Ionicons name="menu" size={24} color={color} />,
         }}
       />
     </Tabs>

@@ -3,6 +3,7 @@ import React from 'react';
 import EditScreenInfo from "@/components/EditScreenInfo";
 import { Text, View } from "@/components/Themed";
 import { Audio } from 'expo-av';
+import { Button } from 'react-native';
 
 export default function TabOneScreen() {
   const [recording, setRecording] = React.useState();
@@ -86,7 +87,7 @@ export default function TabOneScreen() {
       </Button>
       {getRecordingLines()}
 
-      <EditScreenInfo path="app/(tabs)/index.js" />
+      <EditScreenInfo path="app/(tabs)/index.tsx" />
     </View>
   );
 }
