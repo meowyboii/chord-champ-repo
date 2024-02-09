@@ -1,5 +1,6 @@
 import React from 'react';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { Entypo, Fontisto } from '@expo/vector-icons';
 import { Link, Tabs } from 'expo-router';
 import { Pressable } from 'react-native';
 
@@ -29,8 +30,8 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Tab One',
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+          title: 'Chord Recognition',
+          tabBarIcon: ({ color }) => <Fontisto name="music-note" size={24} color={color} /> ,
           headerRight: () => (
             <Link href="/modal" asChild>
               <Pressable>
@@ -50,8 +51,8 @@ export default function TabLayout() {
       <Tabs.Screen
         name="two"
         options={{
-          title: 'Tab Two',
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+          title: 'Chord Progression',
+          tabBarIcon: ({ color }) => <Entypo name="menu" size={24} color={color} />,
         }}
       />
     </Tabs>
