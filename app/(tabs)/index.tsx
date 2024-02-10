@@ -1,6 +1,5 @@
 import { StyleSheet, Image } from 'react-native';
 import Waveform from '@/components/Waveform';
-import EditScreenInfo from '@/components/EditScreenInfo';
 import { Text, View } from '@/components/Themed';
 import ChordChart from '@/components/ChordChart';
 import RecordButton from '@/components/RecordButton';
@@ -13,9 +12,9 @@ export default function TabOneScreen() {
         <LinearGradient colors={['#ff7f50', '#cc2424']} start={{ x: 0.7, y: 0 }} style={styles.child}>
           <Image source={require('../../assets/images/logocolor.png')} style={styles.image} />
           <Text style={styles.title}>ChordChamp</Text>
+          <Waveform/>
         </LinearGradient>
       </View>
-      <Waveform/>
       <ChordChart/>
       <RecordButton/>
       <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
@@ -45,7 +44,6 @@ const styles = StyleSheet.create({
     transform : [ { scaleX : 0.5 } ],
     height : '100%',
     width : '100%',
-    backgroundColor : 'red',
     alignItems : 'center',
     justifyContent : 'center'
   },
