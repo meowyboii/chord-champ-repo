@@ -30,9 +30,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
-    marginTop: 20,
-    marginBottom: 20,
-    width:160,
+    marginTop: 15,
+    marginBottom: 15,
+    width:150,
     maxHeight: 200,
   },
   item: {
