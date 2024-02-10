@@ -6,7 +6,7 @@ export default function ChordChart() {
   const items = Array.from({ length: 25 }, (_, index) => index + 1);
 
   return (
-    <View>
+    <View style={styles.wrapper}>
       <Text style={styles.title}>Am7</Text>
       <View style={styles.container}>
         {items.map((item, index) => (
@@ -25,20 +25,24 @@ export default function ChordChart() {
 }
 
 const styles = StyleSheet.create({
+  wrapper: {
+    backgroundColor: 'transparent',
+    marginTop: 30,
+  },
   container: {
     flex: 1,
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
-    marginTop: 20,
-    marginBottom: 20,
-    width:160,
+    marginTop: 15,
+    marginBottom: 15,
+    width: 100,
     maxHeight: 200,
   },
   item: {
     width: '20%', // 5 items in a row
-    height: 40,
-    backgroundColor: 'lightblue',
+    height: 25,
+    backgroundColor: 'whitesmoke',
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1, // Default border width
@@ -46,7 +50,7 @@ const styles = StyleSheet.create({
   },
   firstRowItem: {
     borderTopWidth: 7, // Higher border width for the first row
-    borderTopColor: 'red', // Color for the first row border
+    borderTopColor: 'gray', // Color for the first row border
   },
   title: {
     fontSize: 20,

@@ -2,6 +2,7 @@ import { TouchableOpacity,StyleSheet } from 'react-native';
 import { useState }from 'react'
 import { Fontisto } from '@expo/vector-icons';
 import { AntDesign } from '@expo/vector-icons';
+import { View } from './Themed';
 
 export default function RecordButton() {
     const [isRecording, setIsRecording] = useState(false);
@@ -18,11 +19,10 @@ export default function RecordButton() {
   };
   return (
     <TouchableOpacity
-      onPress={isRecording ? stopRecording : startRecording}
-    >
-      {isActive? <AntDesign name="pausecircleo" size={50} color="#aa0c0c" onPress={()=>{
+      onPress={isRecording ? stopRecording : startRecording}>
+      {isActive? <AntDesign name="pausecircleo" size={50} color="#cc2424" onPress={()=>{
           setIsActive(!isActive)}}/>:
-      <Fontisto name="record" size={50} color="#aa0c0c" onPress={()=>{
+      <Fontisto name="record" size={50} color="#cc2424" onPress={()=>{
           setIsActive(!isActive)}} />
       }
     </TouchableOpacity>
