@@ -1,88 +1,140 @@
-import React, { useState } from 'react';
-import { Platform, PermissionsAndroid, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StatusBar } from 'expo-status-bar';
+import React from 'react';
+import { Button, StyleSheet, Text, View, TouchableOpacity } from 'react-native';
+import { Audio } from 'expo-av';
 
-const Waveform = () => {
-  const [isRecording, setIsRecording] = useState(false);
-  const [recordSecs, setRecordSecs] = useState(0);
-  const [recordTime, setRecordTime] = useState('');
+export default function TabOneScreen() {
+  const [recording, setRecording] = React.useState<Audio.Recording | undefined>();
+  const [recordings, setRecordings] = React.useState<{
+    sound: Audio.Sound;
+    duration: string;
+    file: string | null;
+  }[]>([]);
+  const [message, setMessage] = React.useState("");
 
-  const onStartRecord = async () => {
-    // Requesting permissions for Android
-    if (Platform.OS === 'android') {
-      try {
-        const granted = await PermissionsAndroid.requestMultiple([
-          PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
-          PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
-          PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
-        ]);
-  
-        // Check if all required permissions are granted
-        if (
-          granted['android.permission.WRITE_EXTERNAL_STORAGE'] === PermissionsAndroid.RESULTS.GRANTED &&
-          granted['android.permission.READ_EXTERNAL_STORAGE'] === PermissionsAndroid.RESULTS.GRANTED &&
-          granted['android.permission.RECORD_AUDIO'] === PermissionsAndroid.RESULTS.GRANTED
-        ) {
-          console.log('All required permissions granted');
-          startRecording(); // Start recording if permissions are granted
-        } else {
-          console.log('Some permissions not granted');
-        }
-      } catch (err) {
-        console.error('Permission request error:', err);
-      }
-    } else {
-      // Start recording for iOS (no need to request permissions)
-      startRecording();
-    }
-  };
-
-
-  const startRecording = async () => {
+  async function startRecording() {
     try {
-
-    } catch (error) {
-      console.error('Error starting recording:', error);
+      const { status } = await Audio.requestPermissionsAsync();
+  
+      if (status === 'granted') {
+        await Audio.setAudioModeAsync({
+          allowsRecordingIOS: true,
+          playsInSilentModeIOS: true,
+        });
+  
+        const { recording } = await Audio.Recording.createAsync({
+          android: {
+            extension: '.wav',
+            outputFormat: 2, // Audio.RECORDING_OPTION_ANDROID_OUTPUT_FORMAT_DEFAULT
+            audioEncoder: 3, // Audio.RECORDING_OPTION_ANDROID_AUDIO_ENCODER_AAC
+            sampleRate: 44100,
+            numberOfChannels: 2,
+            bitRate: 128000,
+          },
+          ios: {
+            extension: '.wav',
+            audioQuality: 0, // Audio.RECORDING_OPTION_IOS_AUDIO_QUALITY_HIGH
+            sampleRate: 44100,
+            numberOfChannels: 2,
+            bitRate: 128000,
+            linearPCMBitDepth: 16,
+            linearPCMIsBigEndian: false,
+            linearPCMIsFloat: false,
+          },
+          web: {}, // Add a dummy web property
+        });
+  
+        setRecording(recording);
+  
+        await recording.startAsync();
+      } else {
+        setMessage('Please grant permission to the app to access the microphone.');
+      }
+    } catch (err) {
+      console.error('Failed to start recording', err);
     }
-  };
+  }
+
+  async function stopRecording() {
+    if (!recording) {
+      return; // Nothing to stop
+    }
+  
+    setRecording(undefined);
+    await recording.stopAndUnloadAsync();
+  
+    let updatedRecordings = [...recordings];
+    const { sound, status } = await recording.createNewLoadedSoundAsync();
+  
+    // Check if status and durationMillis exist before using them
+    const duration = status && 'durationMillis' in status
+      ? getDurationFormatted(status.durationMillis)
+      : 'Unknown';
+  
+    updatedRecordings.push({
+      sound: sound,
+      duration: duration,
+      file: recording.getURI()
+    });
+  
+    setRecordings(updatedRecordings);
+  }
+
+  function getDurationFormatted(millis?: number) {
+    const minutes = (millis || 0) / 1000 / 60;
+    const minutesDisplay = Math.floor(minutes);
+    const seconds = Math.round((minutes - minutesDisplay) * 60);
+    const secondsDisplay = seconds < 10 ? `0${seconds}` : seconds;
+    return `${minutesDisplay}:${secondsDisplay}`;
+  }
+
+  function getRecordingLines() {
+  return recordings.map((recordingLine, index) => (
+    <View key={index} style={styles.row}>
+      <Text style={styles.fill}>
+        Recording {index + 1} = {recordingLine.duration}
+      </Text>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => recordingLine.sound.replayAsync()}
+      >
+        <Text>Play</Text>
+      </TouchableOpacity>
+    </View>
+  ));
+}
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity
-        onPress={isRecording ? startRecording : onStartRecord}
-        style={[styles.button, { backgroundColor: isRecording ? 'red' : 'green' }]}
-      >
-        <Text style={styles.buttonText}>{isRecording ? 'Stop' : 'Record'}</Text>
-      </TouchableOpacity>
-      <View style={styles.recordInfo}>
-        <Text>Record Time: {recordTime}</Text>
-        <Text>Record Secs: {recordSecs}</Text>
-      </View>
+      <Text>{message}</Text>
+      
+      <Button
+        title={recording ? "Stop Recording" : "Start Recording"}
+        onPress={recording ? stopRecording : startRecording} />
+      {getRecordingLines()}
+      <StatusBar style="auto" />
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
+    backgroundColor: 'transparent',
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 20,
+    maxHeight: 100,
+  },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  fill: {
+    flex: 1,
+    margin: 16
   },
   button: {
-    width: 150,
-    height: 50,
-    borderRadius: 25,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  buttonText: {
-    color: 'white',
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  recordInfo: {
-    marginTop: 20,
-  },
+    margin: 16
+  }
 });
-
-export default Waveform;

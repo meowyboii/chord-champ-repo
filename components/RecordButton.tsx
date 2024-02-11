@@ -1,3 +1,4 @@
+import React from 'react';
 import { TouchableOpacity,StyleSheet } from 'react-native';
 import { useState }from 'react'
 import { Fontisto } from '@expo/vector-icons';

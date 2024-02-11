@@ -1,12 +1,8 @@
-<<<<<<< HEAD
-import { StyleSheet } from 'react-native';
+
 import React from 'react';
-=======
 import { StyleSheet, Image } from 'react-native';
->>>>>>> e1af4553fc88d96a6e264bd5552ec9c10f375395
 import Waveform from '@/components/Waveform';
 import { Text, View } from '@/components/Themed';
-import Recording from '@/components/Chord-recognition/recordingcomponent';
 import ChordChart from '@/components/ChordChart';
 import RecordButton from '@/components/RecordButton';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -14,11 +10,6 @@ import { LinearGradient } from 'expo-linear-gradient';
 export default function TabOneScreen() {
   return (
     <View style={styles.container}>
-<<<<<<< HEAD
-      <Text style={styles.title}>ChordChamp</Text>
-      <Recording/>
-      <Waveform/>
-=======
       <View style={[styles.header, styles.elevation]}>
         <LinearGradient colors={['#ff7f50', '#cc2424']} start={{ x: 0.7, y: 0 }} style={styles.child}>
           <Image source={require('../../assets/images/logocolor.png')} style={styles.image} />
@@ -26,7 +17,6 @@ export default function TabOneScreen() {
           <Waveform/>
         </LinearGradient>
       </View>
->>>>>>> e1af4553fc88d96a6e264bd5552ec9c10f375395
       <ChordChart/>
       <RecordButton/>
       <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
