@@ -6,6 +6,7 @@ import { Text, View } from '@/components/Themed';
 import ChordChart from '@/components/ChordChart';
 import RecordButton from '@/components/RecordButton';
 import { LinearGradient } from 'expo-linear-gradient';
+import AudioVisualizer from '@/components/AudioVisualizer';
 
 export default function TabOneScreen() {
   return (
@@ -14,11 +15,11 @@ export default function TabOneScreen() {
         <LinearGradient colors={['#ff7f50', '#cc2424']} start={{ x: 0.7, y: 0 }} style={styles.child}>
           <Image source={require('../../assets/images/logocolor.png')} style={styles.image} />
           <Text style={styles.title}>ChordChamp</Text>
-          <Waveform/>
         </LinearGradient>
       </View>
+      <AudioVisualizer/>
       <ChordChart/>
-      <RecordButton/>
+      <Waveform/>
       <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
       
     </View>
