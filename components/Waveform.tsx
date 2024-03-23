@@ -18,7 +18,8 @@ export default function Waveform() {
     }[]
   >([]);
   const [message, setMessage] = useState("");
-
+  const [loudness, setLoudness] = useState<number>(0);
+  
   async function startRecording() {
     try {
       const { status } = await Audio.requestPermissionsAsync();
@@ -60,6 +61,7 @@ export default function Waveform() {
         setRecording(recording);
 
         await recording.startAsync();
+        
       } else {
         setMessage(
           "Please grant permission to the app to access the microphone."
