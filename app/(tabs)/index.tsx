@@ -17,7 +17,6 @@ export default function TabOneScreen() {
           <Text style={styles.title}>ChordChamp</Text>
         </LinearGradient>
       </View>
-      <AudioVisualizer/>
       <ChordChart/>
       <Waveform/>
       <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />

@@ -6,6 +6,7 @@ import { Audio } from "expo-av";
 import { AntDesign, Fontisto } from "@expo/vector-icons";
 
 export default function Waveform() {
+  
   const [isActive, setIsActive] = useState(false);
   const [recording, setRecording] = useState<
     Audio.Recording | undefined
@@ -20,6 +21,22 @@ export default function Waveform() {
   const [message, setMessage] = useState("");
   const [loudness, setLoudness] = useState<number>(0);
   
+  //get Loudness
+  useEffect(() => {
+    if (recording) {
+      const updateMetering = async () => {
+        const status = await recording.getStatusAsync();
+        if (status.isRecording) {
+          setLoudness(status.metering || 0); // Update metering state with default value of 0 if undefined
+        }
+      };
+  
+      const intervalId = setInterval(updateMetering, 200); // Update metering every 100 milliseconds
+  
+      return () => clearInterval(intervalId);
+    }
+  }, [recording]);
+
   async function startRecording() {
     try {
       const { status } = await Audio.requestPermissionsAsync();
@@ -31,6 +48,7 @@ export default function Waveform() {
         });
 
         const { recording } = await Audio.Recording.createAsync({
+          isMeteringEnabled: true,
           android: {
             extension: ".wav",
             outputFormat: 2, // Audio.RECORDING_OPTION_ANDROID_OUTPUT_FORMAT_DEFAULT
@@ -51,12 +69,11 @@ export default function Waveform() {
           },
           web: {}, // Add a dummy web property
         });
-
         // Set up callback for recording status updates
         recording.setOnRecordingStatusUpdate(update => {
-          console.log("Recording status update:", update); // You can access loudness from 'update' object
-          // You can update state or perform any other action based on the recording status update
+          console.log("Recording status update:", update); 
         });
+        
 
         setRecording(recording);
 
@@ -96,6 +113,7 @@ export default function Waveform() {
     });
 
     setRecordings(updatedRecordings);
+    setLoudness(-160);
   }
 
   function getDurationFormatted(millis?: number) {
@@ -121,10 +139,10 @@ export default function Waveform() {
       </View>
     ));
   }
-
   return (
     <View style={styles.container}>
-      <Text>{message}</Text>
+      <Text style={{color:"white"}}>{message}</Text>
+      <Text style={{color:"white"}}>{loudness}</Text>
       <TouchableOpacity
         onPress={() => {
           recording ? stopRecording() : startRecording();
@@ -137,6 +155,10 @@ export default function Waveform() {
           <Fontisto name="record" size={50} color="#cc2424" />
         )}
       </TouchableOpacity>
+      {/* Render the audio visualization */}
+      <View style={styles.visualizationContainer}>
+        <View style={{ width: Math.pow(Math.max(0, loudness + 160),1.12), height: 30, backgroundColor: 'white' }} />
+      </View>
       {getRecordingLines()}
       <StatusBar style="auto" />
     </View>
@@ -164,5 +186,12 @@ const styles = StyleSheet.create({
   },
   button: {
     margin: 16,
+  },
+  visualizationContainer: {
+    width: '100%',
+    height: 20,
+    backgroundColor: 'white',
+    marginTop: 20,
+    marginBottom: 20,
   },
 });
