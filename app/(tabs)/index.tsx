@@ -12,10 +12,12 @@ export default function TabOneScreen() {
   return (
     <View style={styles.container}>
       <View style={[styles.header, styles.elevation]}>
+        
         <LinearGradient colors={['#ff7f50', '#cc2424']} start={{ x: 0.7, y: 0 }} style={styles.child}>
           <Image source={require('../../assets/images/logocolor.png')} style={styles.image} />
           <Text style={styles.title}>ChordChamp</Text>
         </LinearGradient>
+        
       </View>
       <ChordChart/>
       <Waveform/>
@@ -69,4 +71,5 @@ const styles = StyleSheet.create({
     elevation: 120,
     shadowColor: '#aa0c0c',
   },
+ 
 });

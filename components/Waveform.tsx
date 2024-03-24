@@ -4,6 +4,7 @@ import {useState,useEffect} from "react";
 import { Button, StyleSheet, Text, View, TouchableOpacity } from "react-native";
 import { Audio } from "expo-av";
 import { AntDesign, Fontisto } from "@expo/vector-icons";
+import AudioVisualizer from '@/components/AudioVisualizer';
 
 export default function Waveform() {
   
@@ -23,6 +24,7 @@ export default function Waveform() {
   
   //get Loudness
   useEffect(() => {
+    setLoudness(-160);
     if (recording) {
       const updateMetering = async () => {
         const status = await recording.getStatusAsync();
@@ -31,7 +33,7 @@ export default function Waveform() {
         }
       };
   
-      const intervalId = setInterval(updateMetering, 200); // Update metering every 100 milliseconds
+      const intervalId = setInterval(updateMetering, 500); // Update metering every 100 milliseconds
   
       return () => clearInterval(intervalId);
     }
@@ -67,7 +69,10 @@ export default function Waveform() {
             linearPCMIsBigEndian: false,
             linearPCMIsFloat: false,
           },
-          web: {}, // Add a dummy web property
+          web: {
+            mimeType: 'audio/webm',
+            bitsPerSecond: 128000,
+          },
         });
         // Set up callback for recording status updates
         recording.setOnRecordingStatusUpdate(update => {
@@ -134,15 +139,26 @@ export default function Waveform() {
           style={styles.button}
           onPress={() => recordingLine.sound.replayAsync()}
         >
-          <Text style={{color:"white"}}>Play</Text>
+          <Text style={{color:"gray"}}>Play</Text>
         </TouchableOpacity>
       </View>
     ));
   }
+
+  // Generate an array of 15 heights (adjust this as needed)
+  const heights = Array.from({ length: 15 }, (_, index) => {
+    return index * 10; // Example logic: increasing heights by 10 for each index
+  });
+
   return (
     <View style={styles.container}>
-      <Text style={{color:"white"}}>{message}</Text>
-      <Text style={{color:"white"}}>{loudness}</Text>
+      <Text style={{color:"gray"}}>{message}</Text>
+      <View style={styles.audioBar}>
+      {heights.map((height, index) => (
+        <AudioVisualizer key={index} height={height} />
+      ))}
+    </View>
+      <Text style={{color:"gray"}}>{loudness}</Text>
       <TouchableOpacity
         onPress={() => {
           recording ? stopRecording() : startRecording();
@@ -157,7 +173,7 @@ export default function Waveform() {
       </TouchableOpacity>
       {/* Render the audio visualization */}
       <View style={styles.visualizationContainer}>
-        <View style={{ width: Math.pow(Math.max(0, loudness + 160),1.12), height: 30, backgroundColor: 'white' }} />
+        <View style={{ width: Math.pow(Math.max(0, loudness + 140),1.2), height: 30, backgroundColor: 'gray' }} />
       </View>
       {getRecordingLines()}
       <StatusBar style="auto" />
@@ -177,12 +193,12 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    color:"white",
+    color:"gray",
   },
   fill: {
     flex: 1,
     margin: 16,
-    color:"white",
+    color:"gray",
   },
   button: {
     margin: 16,
@@ -193,5 +209,12 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     marginTop: 20,
     marginBottom: 20,
+  },
+  audioBar: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'flex-end',
+    flex: 1,
+    backgroundColor: 'transparent'
   },
 });
