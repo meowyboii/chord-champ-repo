@@ -1,17 +1,14 @@
 import { StatusBar } from "expo-status-bar";
 import React from "react";
-import {useState,useEffect} from "react";
+import { useState, useEffect } from "react";
 import { Button, StyleSheet, Text, View, TouchableOpacity } from "react-native";
 import { Audio } from "expo-av";
-import { AntDesign, Fontisto } from "@expo/vector-icons";
-import AudioVisualizer from '@/components/AudioVisualizer';
+import { Feather, Fontisto, FontAwesome6 } from "@expo/vector-icons";
+import AudioVisualizer from "@/components/AudioVisualizer";
 
 export default function Waveform() {
-  
   const [isActive, setIsActive] = useState(false);
-  const [recording, setRecording] = useState<
-    Audio.Recording | undefined
-  >();
+  const [recording, setRecording] = useState<Audio.Recording | undefined>();
   const [recordings, setRecordings] = useState<
     {
       sound: Audio.Sound;
@@ -21,7 +18,19 @@ export default function Waveform() {
   >([]);
   const [message, setMessage] = useState("");
   const [loudness, setLoudness] = useState<number>(0);
-  
+
+  const [isPaused, setIsPaused] = useState(false);
+
+  const pauseRecording = () => {
+    setIsPaused(true);
+    // Call your recording pause function here
+  };
+
+  const resumeRecording = () => {
+    setIsPaused(false);
+    // Call your recording resume function here
+  };
+
   //get Loudness
   useEffect(() => {
     setLoudness(-160);
@@ -32,9 +41,9 @@ export default function Waveform() {
           setLoudness(status.metering || 0); // Update metering state with default value of 0 if undefined
         }
       };
-  
+
       const intervalId = setInterval(updateMetering, 500); // Update metering every 100 milliseconds
-  
+
       return () => clearInterval(intervalId);
     }
   }, [recording]);
@@ -70,20 +79,18 @@ export default function Waveform() {
             linearPCMIsFloat: false,
           },
           web: {
-            mimeType: 'audio/webm',
+            mimeType: "audio/webm",
             bitsPerSecond: 128000,
           },
         });
         // Set up callback for recording status updates
-        recording.setOnRecordingStatusUpdate(update => {
-          console.log("Recording status update:", update); 
+        recording.setOnRecordingStatusUpdate((update) => {
+          console.log("Recording status update:", update);
         });
-        
 
         setRecording(recording);
 
         await recording.startAsync();
-        
       } else {
         setMessage(
           "Please grant permission to the app to access the microphone."
@@ -100,6 +107,7 @@ export default function Waveform() {
     }
 
     setRecording(undefined);
+    setIsPaused(false);
     await recording.stopAndUnloadAsync();
 
     let updatedRecordings = [...recordings];
@@ -139,7 +147,7 @@ export default function Waveform() {
           style={styles.button}
           onPress={() => recordingLine.sound.replayAsync()}
         >
-          <Text style={{color:"gray"}}>Play</Text>
+          <Text style={{ color: "gray" }}>Play</Text>
         </TouchableOpacity>
       </View>
     ));
@@ -152,28 +160,53 @@ export default function Waveform() {
 
   return (
     <View style={styles.container}>
-      <Text style={{color:"gray"}}>{message}</Text>
+      <Text style={{ color: "gray" }}>{message}</Text>
       <View style={styles.audioBar}>
-      {heights.map((height, index) => (
-        <AudioVisualizer key={index} height={height} />
-      ))}
-    </View>
-      <Text style={{color:"gray"}}>{loudness}</Text>
-      <TouchableOpacity
-        onPress={() => {
-          recording ? stopRecording() : startRecording();
-          setIsActive(!isActive);
-        }}
-      >
-        {isActive ? (
-          <AntDesign name="pausecircleo" size={50} color="#cc2424" />
-        ) : (
-          <Fontisto name="record" size={50} color="#cc2424" />
+        {heights.map((height, index) => (
+          <AudioVisualizer key={index} height={height} />
+        ))}
+      </View>
+      <Text style={{ color: "gray" }}>{loudness}</Text>
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity
+          style={styles.recordButtonContainer}
+          onPress={() => {
+            if (recording) {
+              if (isPaused) {
+                resumeRecording();
+              } else {
+                pauseRecording();
+              }
+            } else {
+              startRecording();
+            }
+          }}
+        >
+          {recording ? (
+            isPaused ? (
+              <Fontisto name="record" size={50} color="#cc2424" />
+            ) : (
+              <Feather name="pause" size={50} color="#cc2424" />
+            )
+          ) : (
+            <Fontisto name="record" size={50} color="#cc2424" />
+          )}
+        </TouchableOpacity>
+        {recording && !isPaused && (
+          <TouchableOpacity style={styles.stopButton} onPress={stopRecording}>
+            <FontAwesome6 name="stop-circle" size={50} color="#cc2424" />
+          </TouchableOpacity>
         )}
-      </TouchableOpacity>
+      </View>
       {/* Render the audio visualization */}
       <View style={styles.visualizationContainer}>
-        <View style={{ width: Math.pow(Math.max(0, loudness + 140),1.2), height: 30, backgroundColor: 'gray' }} />
+        <View
+          style={{
+            width: Math.pow(Math.max(0, loudness + 140), 1.2),
+            height: 30,
+            backgroundColor: "gray",
+          }}
+        />
       </View>
       {getRecordingLines()}
       <StatusBar style="auto" />
@@ -193,28 +226,37 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    color:"gray",
+    color: "gray",
   },
   fill: {
     flex: 1,
     margin: 16,
-    color:"gray",
+    color: "gray",
   },
   button: {
     margin: 16,
   },
   visualizationContainer: {
-    width: '100%',
+    width: "100%",
     height: 20,
-    backgroundColor: 'white',
+    backgroundColor: "white",
     marginTop: 20,
     marginBottom: 20,
   },
   audioBar: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'flex-end',
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "flex-end",
     flex: 1,
-    backgroundColor: 'transparent'
+    backgroundColor: "transparent",
   },
+  buttonContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  recordButtonContainer: {
+    marginRight: 16,
+  },
+  stopButton: {},
 });
